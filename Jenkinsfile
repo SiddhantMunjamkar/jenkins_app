@@ -29,9 +29,14 @@ pipeline {
             }
             steps {
                 sh '''
-                    npm install -g serve
-                    serve -s build
-                    npx playwright test
+                    test -f build/index.html
+                    if [ $? -eq 0 ]; then
+                      echo "index.html exists. Running tests..."
+                      npm run test
+                    else
+                      echo "index.html does not exist!"
+                      exit 1
+                    fi
                 '''
             }
         }
@@ -45,14 +50,9 @@ pipeline {
             }
             steps {
                 sh '''
-                    test -f build/index.html
-                    if [ $? -eq 0 ]; then
-                      echo "index.html exists. Running tests..."
-                      npm run test
-                    else
-                      echo "index.html does not exist!"
-                      exit 1
-                    fi
+                    npm install -g serve
+                    serve -s build
+                    npx playwright test
                 '''
             }
                 }
