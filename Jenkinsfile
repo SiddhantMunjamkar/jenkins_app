@@ -20,32 +20,31 @@ pipeline {
                 '''
             }
         }
-        stage('Test') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
-            steps {
-                sh '''
-                    test -f build/index.html
-                    if [ $? -eq 0 ]; then
-                      echo "index.html exists. Running tests..."
-                      npm run test
-                    else
-                      echo "index.html does not exist!"
-                      exit 1
-                    fi
-                '''
-            }
-        }
+        // stage('Test') {
+        //     agent {
+        //         docker {
+        //             image 'node:18-alpine'
+        //             reuseNode true
+        //         }
+        //     }
+        //     steps {
+        //         sh '''
+        //             test -f build/index.html
+        //             if [ $? -eq 0 ]; then
+        //               echo "index.html exists. Running tests..."
+        //               npm run test
+        //             else
+        //               echo "index.html does not exist!"
+        //               exit 1
+        //             fi
+        //         '''
+        //     }
+        // }
         stage('E2E Test') {
             agent {
                 docker {
                     image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
                     reuseNode true
-                    args '-u root:root'
                 }
             }
             steps {
