@@ -1,7 +1,8 @@
 pipeline {
     agent any
 
-        stages {
+    stages {
+        // Optional: Uncomment this stage if you want to build before testing
         // stage('Build') {
         //     agent {
         //         docker {
@@ -20,6 +21,7 @@ pipeline {
         //         '''
         //     }
         // }
+
         stage('Unit tests') {
             parallel {
                 stage('Test') {
@@ -31,22 +33,23 @@ pipeline {
                     }
                     steps {
                         sh '''
-                        test -f build/index.html
-                        if [ $? -eq 0 ]; then
-                        echo "index.html exists. Running tests..."
-                        npm run test -- --watchAll=false --forceExit
-                        else
-                        echo "index.html does not exist!"
-                        exit 1
-                        fi
-                    '''
+                            test -f build/index.html
+                            if [ $? -eq 0 ]; then
+                                echo "index.html exists. Running unit tests..."
+                                npm run test -- --watchAll=false --forceExit
+                            else
+                                echo "index.html does not exist!"
+                                exit 1
+                            fi
+                        '''
+                    }
                     post {
                         always {
                             junit 'jest-results/junit.xml'
-                            }
                         }
                     }
                 }
+
                 stage('E2E Test') {
                     agent {
                         docker {
@@ -56,15 +59,23 @@ pipeline {
                     }
                     steps {
                         sh '''
-                        npm install serve
-                        node_modules/.bin/serve -s build &
-                        sleep 10
-                        npx playwright test --reporter=html
-                    '''
+                            npm install serve
+                            node_modules/.bin/serve -s build &  # Start static server
+                            sleep 10                            # Wait for the server to be ready
+                            npx playwright test --reporter=html
+                        '''
                     }
                     post {
                         always {
-                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+                            publishHTML([
+                                allowMissing: false,
+                                alwaysLinkToLastBuild: false,
+                                keepAll: false,
+                                reportDir: 'playwright-report',
+                                reportFiles: 'index.html',
+                                reportName: 'Playwright HTML Report',
+                                useWrapperFileDirectly: true
+                            ])
                         }
                     }
                 }
