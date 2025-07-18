@@ -93,11 +93,12 @@ pipeline {
             }
             steps {
                 sh '''
-                npm install netlify-cli
-                node_modules/.bin/netlify  --version
+                npm ci
+                npm install netlify-cli --no-save
+                node_modules/.bin/netlify --version
                 echo "Deploying to Netlify... Site ID: $NETLIFY_SITE_ID"
                 node_modules/.bin/netlify status
-                node_modules/.bin/netlify deploy  --dir=build --prod 
+                node_modules/.bin/netlify deploy --dir=build --prod --message="Deploy from Jenkins" --skip-existing-files --no-build
                 '''
             }
         }
