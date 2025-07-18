@@ -32,7 +32,7 @@ pipeline {
                     test -f build/index.html
                     if [ $? -eq 0 ]; then
                       echo "index.html exists. Running tests..."
-                      npm run test
+                      npm run test -- --watchAll=false --forceExit
                     else
                       echo "index.html does not exist!"
                       exit 1
@@ -55,11 +55,6 @@ pipeline {
                     npx playwright test
                 '''
             }
-                }
-    }
-    post {
-        always {
-            junit 'jest-results/junit.xml'
         }
     }
 }
