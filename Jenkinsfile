@@ -95,10 +95,12 @@ pipeline {
             steps {
                 sh '''
                 npm install netlify-cli --no-save
+                npm install node-jq
                 node_modules/.bin/netlify --version
                 echo "Deploying to Netlify (staging)... Site ID: $NETLIFY_SITE_ID"
                 node_modules/.bin/netlify status
-                node_modules/.bin/netlify deploy --dir=build  --message="Deploy from Jenkins" --no-build
+                node_modules/.bin/netlify deploy --dir=build  --message="Deploy from Jenkins" --no-build --json > deploy-output.json
+                node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json
                 '''
             }
         }
