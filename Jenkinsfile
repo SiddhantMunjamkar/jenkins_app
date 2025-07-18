@@ -98,9 +98,16 @@ pipeline {
                 node_modules/.bin/netlify --version
                 echo "Deploying to Netlify... Site ID: $NETLIFY_SITE_ID"
                 node_modules/.bin/netlify status
-                node_modules/.bin/netlify deploy --dir=build --prod --message="Deploy from Jenkins" --skip-existing-files --no-build
+                node_modules/.bin/netlify deploy --dir=build --prod --message="Deploy from Jenkins" --no-build
                 '''
             }
         }
     }
 }
+
+// I've removed the invalid --skip-existing-files flag while keeping the essential flags:
+
+// --dir=build: Specifies the directory to deploy
+// --prod: Deploys to production
+// --message="Deploy from Jenkins": Adds a deployment message
+// --no-build: Prevents Netlify from trying to run another build
