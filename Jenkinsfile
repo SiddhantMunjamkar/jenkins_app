@@ -77,7 +77,7 @@ pipeline {
                                 keepAll: false,
                                 reportDir: 'playwright-report',
                                 reportFiles: 'index.html',
-                                reportName: 'Playwright HTML Report',
+                                reportName: 'Playwright Local',
                                 useWrapperFileDirectly: true
                             ])
                         }
@@ -100,6 +100,36 @@ pipeline {
                 node_modules/.bin/netlify status
                 node_modules/.bin/netlify deploy --dir=build --prod --message="Deploy from Jenkins" --no-build
                 '''
+            }
+        }
+        stage(' prod E2E Test') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    reuseNode true
+                }
+            }
+
+            environment {
+               CI_ENVIRONMENT_URL = 'https://bespoke-sable-fe6e32.netlify.app'
+            }
+            steps {
+                sh '''
+            npx playwright test --reporter=html
+        '''
+            }
+            post {
+                always {
+                    publishHTML([
+                allowMissing: false,
+                alwaysLinkToLastBuild: false,
+                keepAll: false,
+                reportDir: 'playwright-report',
+                reportFiles: 'index.html',
+                reportName: 'Playwright E2E',
+                useWrapperFileDirectly: true
+            ])
+                }
             }
         }
     }
