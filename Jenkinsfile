@@ -55,6 +55,11 @@ pipeline {
                     npx playwright test
                 '''
             }
+        }  
+    }
+    post {
+        always {
+            junit 'jest-results/junit.xml'
         }
     }
 }
