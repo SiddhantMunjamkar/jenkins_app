@@ -85,7 +85,7 @@ pipeline {
                 }
             }
         }
-        stage('Deploy') {
+        stage('Deploy staging') {
             agent {
                 docker {
                     image 'node:18-alpine'
@@ -96,7 +96,24 @@ pipeline {
                 sh '''
                 npm install netlify-cli --no-save
                 node_modules/.bin/netlify --version
-                echo "Deploying to Netlify... Site ID: $NETLIFY_SITE_ID"
+                echo "Deploying to Netlify (staging)... Site ID: $NETLIFY_SITE_ID"
+                node_modules/.bin/netlify status
+                node_modules/.bin/netlify deploy --dir=build --staging --message="Deploy from Jenkins" --no-build
+                '''
+            }
+        }
+        stage('Deploy prod') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                sh '''
+                npm install netlify-cli --no-save
+                node_modules/.bin/netlify --version
+                echo "Deploying to Netlify... (production) Site ID: $NETLIFY_SITE_ID" 
                 node_modules/.bin/netlify status
                 node_modules/.bin/netlify deploy --dir=build --prod --message="Deploy from Jenkins" --no-build
                 '''
