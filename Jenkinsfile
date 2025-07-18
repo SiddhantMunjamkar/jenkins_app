@@ -1,8 +1,6 @@
 pipeline {
     agent any
-
     stages {
-        Optional: Uncomment this stage if you want to build before testing
         stage('Build') {
             agent {
                 docker {
