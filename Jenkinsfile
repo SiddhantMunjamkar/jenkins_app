@@ -100,8 +100,41 @@ pipeline {
                 echo "Deploying to Netlify (staging)... Site ID: $NETLIFY_SITE_ID"
                 node_modules/.bin/netlify status
                 node_modules/.bin/netlify deploy --dir=build  --message="Deploy from Jenkins" --no-build --json > deploy-output.json
-                node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json
                 '''
+                script {
+                    env.CI_ENVIRONMENT_URL = sh(script: "node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json", returnStdout: true)
+                }
+            }
+        }
+        stage(' staging E2E Test') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    reuseNode true
+                }
+            }
+
+            environment {
+               CI_ENVIRONMENT_URL = "${env.CI_ENVIRONMENT_URL}"
+            }
+            steps {
+                sh '''
+                    npm ci
+                    npx playwright test --reporter=html
+                '''
+            }
+            post {
+                always {
+                    publishHTML([
+                allowMissing: false,
+                alwaysLinkToLastBuild: false,
+                keepAll: false,
+                reportDir: 'playwright-report',
+                reportFiles: 'index.html',
+                reportName: 'Playwright E2E',
+                useWrapperFileDirectly: true
+            ])
+                }
             }
         }
         stage('Approval') {
