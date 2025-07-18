@@ -49,17 +49,23 @@ pipeline {
             }
             steps {
                 sh '''
+                    npm ci
                     npm install serve
                     node_modules/.bin/serve -s build &
+                    server_pid=$!
                     sleep 10
-                    npx playwright test
+                    PLAYWRIGHT_JUNIT_OUTPUT_NAME=test-results/test-results.xml npx playwright test --reporter=junit
+                    kill $server_pid || true
                 '''
             }
                 }
     }
     post {
         always {
-            junit 'jest-results/junit.xml'
+            junit(
+                testResults: ['jest-results/junit.xml', 'test-results/test-results.xml'],
+                allowEmptyResults: true
+            )
         }
     }
 }
