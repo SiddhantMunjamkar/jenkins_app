@@ -94,8 +94,8 @@ pipeline {
             }
             steps {
                 sh '''
-                npm install netlify-cli --no-save
-                npm install node-jq --no-save
+                npm ci
+                npm install netlify-cli node-jq --no-save
                 node_modules/.bin/netlify --version
                 echo "Deploying to Netlify (staging)... Site ID: $NETLIFY_SITE_ID"
                 node_modules/.bin/netlify status
@@ -120,6 +120,7 @@ pipeline {
             }
             steps {
                 sh '''
+                npm ci
                 npm install netlify-cli --no-save
                 node_modules/.bin/netlify --version
                 echo "Deploying to Netlify... (production) Site ID: $NETLIFY_SITE_ID" 
@@ -141,8 +142,9 @@ pipeline {
             }
             steps {
                 sh '''
-            npx playwright test --reporter=html
-        '''
+                    npm ci
+                    npx playwright test --reporter=html
+                '''
             }
             post {
                 always {
