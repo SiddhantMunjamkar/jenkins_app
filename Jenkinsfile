@@ -1,25 +1,25 @@
 pipeline {
     agent any
 
-        // stages {
-        //     stage('Build') {
-        //         agent {
-        //             docker {
-        //                 image 'node:18-alpine'
-        //                 reuseNode true
-        //             }
-        //         }
-        //         steps {
-        //             sh '''
-        //                 ls -la
-        //                 node --version
-        //                 npm --version
-        //                 npm ci
-        //                 npm run build
-        //                 ls -la
-        //             '''
+        stages {
+        // stage('Build') {
+        //     agent {
+        //         docker {
+        //             image 'node:18-alpine'
+        //             reuseNode true
         //         }
         //     }
+        //     steps {
+        //         sh '''
+        //             ls -la
+        //             node --version
+        //             npm --version
+        //             npm ci
+        //             npm run build
+        //             ls -la
+        //         '''
+        //     }
+        // }
         stage('Run Tests') {
             parallel {
                 stage('Test') {
@@ -59,11 +59,12 @@ pipeline {
                     }
                 }
             }
-        post {
-            always {
-                junit 'jest-results/junit.xml'
-                publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+            post {
+                always {
+                    junit 'jest-results/junit.xml'
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+                }
             }
         }
-        }
     }
+}
