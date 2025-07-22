@@ -6,6 +6,20 @@ pipeline {
         NETLIFY_AUTH_TOKEN = credentials('netlify-token') // Ensure you have this credential set up in Jenkins
     }
     stages {
+        stage('AWS') {
+            agent {
+                docker {
+                    image 'amazon/aws-cli'
+                    args "--entrypoint=''"
+                }
+            }
+            steps {
+                sh'''
+                    aws --version
+                    echo "Configuring AWS CLI..."
+                '''
+            }
+        }
         stage('Build') {
             agent {
                 docker {
@@ -115,7 +129,7 @@ pipeline {
             }
 
             environment {
-               CI_ENVIRONMENT_URL = "${env.CI_ENVIRONMENT_URL}"
+                CI_ENVIRONMENT_URL = "${env.CI_ENVIRONMENT_URL}"
             }
             steps {
                 sh '''
@@ -155,7 +169,7 @@ pipeline {
                 sh '''
                 npm install netlify-cli --no-save
                 node_modules/.bin/netlify --version
-                echo "Deploying to Netlify... (production) Site ID: $NETLIFY_SITE_ID" 
+                echo "Deploying to Netlify... (production) Site ID: $NETLIFY_SITE_ID"
                 node_modules/.bin/netlify status
                 node_modules/.bin/netlify deploy --dir=build --prod --message="Deploy from Jenkins" --no-build
                 '''
@@ -170,7 +184,7 @@ pipeline {
             }
 
             environment {
-               CI_ENVIRONMENT_URL = 'https://bespoke-sable-fe6e32.netlify.app'
+                CI_ENVIRONMENT_URL = 'https://bespoke-sable-fe6e32.netlify.app'
             }
             steps {
                 sh '''
