@@ -13,13 +13,16 @@ pipeline {
                     args "--entrypoint=''"
                 }
             }
+            environment {
+                AWS_S3_BUCKET = 'jenkins-learn-siddhant'
+            }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'my-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
                 // some block
                     sh '''
                         aws --version
                         echo "Configuring AWS CLI..." > index.html
-                        aws s3 cp  index.html s3://jenkins-learn-siddhant/index.html
+                        aws s3 cp  index.html s3://$AWS_S3_BUCKET/index.html
                     '''
                 }
             }
