@@ -16,11 +16,11 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'my-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
                 // some block
-                sh '''
-                    aws --version
-                    echo "Configuring AWS CLI..."
-                    aws s3 ls
-                '''
+                    sh '''
+                        aws --version
+                        echo "Configuring AWS CLI..." > index.html
+                        aws s3 cp  index.html s3://jenkins-learn-siddhant/index.html
+                    '''
                 }
             }
         }
