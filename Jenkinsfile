@@ -17,6 +17,7 @@ pipeline {
                 sh'''
                     aws --version
                     echo "Configuring AWS CLI..."
+                    aws s3 ls
                 '''
             }
         }
