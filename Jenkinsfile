@@ -25,11 +25,26 @@ pipeline {
                 '''
             }
         }
+        stage('Build docker image') {
+            agent {
+                docker {
+                    image 'amazon/aws-cli'
+                    reuseNode true
+                    args " -u root -v /var/run/docker.sock:/var/run/docker.sock --entrypoint=''"
+                }
+            }
+            steps {
+                sh '''
+                    amazon-linux-extras install docker
+                    docker build -t myjenkinsapp .
+                '''
+            }
+        }
         stage('AWS') {
             agent {
                 docker {
                     image 'amazon/aws-cli'
-                    args " -u --entrypoint=''"
+                    args " -u root --entrypoint=''"
                     reuseNode true
                 }
             }
@@ -40,15 +55,14 @@ pipeline {
                 AWS_ECS_CLUSTER = 'jenkins-learn-siddhant-cluster'
                 AWS_ECS_SERVICE = 'jenkins-learn-siddhant-service'
                 AWS_ECS_TASK_DEFINITION = 'learn-jenkins-app-prod'
-
             }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'my-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
-                // some block
-                // echo "Configuring AWS CLI..." > index.html
-                // aws s3 cp  index.html s3://$AWS_S3_BUCKET/index.html
-                // aws --version
-                // aws s3 sync build s3://$AWS_S3_BUCKET
+                    // some block
+                    // echo "Configuring AWS CLI..." > index.html
+                    // aws s3 cp  index.html s3://$AWS_S3_BUCKET/index.html
+                    // aws --version
+                    // aws s3 sync build s3://$AWS_S3_BUCKET
                     sh '''
                         aws --version
                         yum install jq -y
